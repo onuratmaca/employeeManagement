@@ -30,6 +30,11 @@ with app.app_context():
     db.create_all()
 
 # Routes
+@app.route('/')
+def home():
+    return "Employee Management System is Live! Navigate to /login or other routes."
+
+
 @app.route('/register', methods=['POST'])
 def register():
     data = request.json
