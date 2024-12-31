@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 400px;
+        }
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+            display: block;
+            width: 100%;
+        }
+        div {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Employee Dashboard</h2>
+        <button onclick="clockIn()">Clock In</button>
+        <button onclick="clockOut()">Clock Out</button>
+        <button onclick="getHours()">View Hours Worked</button>
+        <div id="output"></div>
+        <button onclick="logout()">Logout</button>
+    </div>
+    <script>
+        async function clockIn() {
+            const username = prompt("Enter your username");
+            const response = await fetch('http://127.0.0.1:5000/clock-in', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username }),
+            });
+            const data = await response.json();
+            alert(data.message);
+        }
+
+        async function clockOut() {
+            const username = prompt("Enter your username");
+            const response = await fetch('http://127.0.0.1:5000/clock-out', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username }),
+            });
+            const data = await response.json();
+            alert(data.message);
+        }
+
+        async function getHours() {
+            const username = prompt("Enter your username");
+            const response = await fetch(`http://127.0.0.1:5000/hours-worked?username=${username}`);
+            const data = await response.json();
+            document.getElementById('output').innerText = `Total Hours: ${data.total_hours.toFixed(2)}, Total Payment: $${data.total_payment.toFixed(2)}`;
+        }
+
+        function logout() {
+            window.location.href = "login.html";
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 400px;
+        }
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+            display: block;
+            width: 100%;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Admin Dashboard</h2>
+        <button onclick="fetchUnapproved()">View Unapproved Users</button>
+        <ul id="userList"></ul>
+    </div>
+    <script>
+        async function fetchUnapproved() {
+            const adminUsername = prompt("Enter admin username:");
+            const adminPassword = prompt("Enter admin password:");
+            try {
+                const response = await fetch(
+                    `http://127.0.0.1:5000/unapproved-users?admin_username=${adminUsername}&admin_password=${adminPassword}`
+                );
+                if (!response.ok) {
+                    throw new Error(`Error: ${response.statusText}`);
+                }
+                const users = await response.json();
+                const userList = document.getElementById('userList');
+                userList.innerHTML = '';
+                users.forEach(user => {
+                    const li = document.createElement('li');
+                    li.textContent = user.username;
+                    const approveButton = document.createElement('button');
+                    approveButton.textContent = 'Approve';
+                    approveButton.onclick = async () => {
+                        const approveResponse = await fetch('http://127.0.0.1:5000/approve-user', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                admin_username: adminUsername,
+                                admin_password: adminPassword,
+                                username: user.username
+                            }),
+                        });
+                        const result = await approveResponse.json();
+                        alert(result.message);
+                        fetchUnapproved();
+                    };
+                    li.appendChild(approveButton);
+                    userList.appendChild(li);
+                });
+            } catch (error) {
+                alert(`Failed to fetch unapproved users: ${error.message}`);
+            }
+        }
+    </script>
+</body>
+</html>
